@@ -1,461 +1,317 @@
-# Polymarket Human-Readable Markets Subgraph
+# 🎯 Polymarket Names Subgraph
 
-This subgraph indexes Polymarket market data from UMA CTF Adapter contracts to extract human-readable market names. It provides a mapping between market IDs and their human-readable questions, eliminating the need to rely on Polymarket's API for this information.
+**The first decentralized solution for extracting human-readable Polymarket market names directly from blockchain data.**
 
-## Overview
+[![Subgraph](https://img.shields.io/badge/Subgraph-Live-brightgreen)](https://api.thegraph.com/subgraphs/id/QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku)
+[![Network](https://img.shields.io/badge/Network-Polygon-8247E5)]()
+[![License](https://img.shields.io/badge/License-MIT-blue)]()
 
-The subgraph indexes the following contracts:
+---
 
-1. **Current UMA CTF Adapter V2**: `0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74`
-2. **Legacy UMA CTF Adapter**: `0x71392E133063CC0D16F40E1F9B60227404Bc03f7`
-3. **Binary Adapter**: `0xCB1822859cEF82Cd2Eb4E6276C7916e692995130`
+## 🚀 **Why This Matters**
 
-It captures `QuestionInitialized` events from these contracts and extracts the human-readable question from the ancillary data.
+**Before:** Developers had to rely on Polymarket's API to get human-readable market names
+```json
+// Raw subgraph data
+{
+  "conditionId": "0xe5107ae8640f781ba136c89c5be7934dbc5dd67ce10b95e10e8fa7e085cd7344",
+  "question": "???"  // No human-readable name!
+}
+```
 
-## Schema
+**After:** Get clean, human-readable names directly from blockchain data
+```json
+// With Polymarket Names Subgraph
+{
+  "questionID": "0xe5107ae8640f781ba136c89c5be7934dbc5dd67ce10b95e10e8fa7e085cd7344",
+  "question": "LEC Finals: G2 vs. Movistar KOI - G2 and Movistar KOI are scheduled to play..."
+}
+```
 
-The subgraph defines the following entities:
+## 🎯 **Key Features**
 
+- ✅ **100% Decentralized** - No API dependencies
+- ✅ **Human-Readable Names** - Clean market titles extracted from on-chain data
+- ✅ **Real-Time** - Indexes new markets as they're created
+- ✅ **Comprehensive** - Covers all market types (crypto, sports, politics, etc.)
+- ✅ **Integration Ready** - Perfect for dashboards, bots, and analytics
+
+## 📊 **Quick Example**
+
+```graphql
+{
+  # Get recent markets with clean, readable names
+  markets(first: 5, orderBy: timestamp, orderDirection: desc) {
+    questionID
+    question          # 🎯 Human-readable market name!
+    creator
+    reward
+    timestamp
+  }
+}
+```
+
+**Sample Response:**
+```json
+{
+  "data": {
+    "markets": [
+      {
+        "questionID": "0xe5107ae8...",
+        "question": "Bitcoin Up or Down – May 28 (9 AM ET Candle)",
+        "creator": "0x91430cad...",
+        "reward": "5000000",
+        "timestamp": "1749328016"
+      }
+    ]
+  }
+}
+```
+
+## 🔧 **How It Works**
+
+This subgraph indexes UMA CTF Adapter contracts on Polygon to extract human-readable questions from ancillary data:
+
+1. **Listens** for `QuestionInitialized` events from UMA CTF Adapter contracts
+2. **Extracts** ancillary data containing human-readable market questions
+3. **Parses** the data to extract clean, dashboard-ready titles
+4. **Stores** the mapping between questionID and human-readable names
+
+### **Indexed Contracts:**
+- **Current UMA CTF Adapter V2**: `0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74`
+- **Legacy UMA CTF Adapter**: `0x71392E133063CC0D16F40E1F9B60227404Bc03f7`
+- **Binary Adapter**: `0xCB1822859cEF82Cd2Eb4E6276C7916e692995130`
+
+## 📋 **Schema Overview**
+
+### **Core Entity: `Market`**
 ```graphql
 type Market @entity {
   id: ID!
-  questionID: Bytes!
-  creator: Bytes
-  question: String
-  ancillaryData: Bytes
-  rewardToken: Bytes
-  reward: BigInt
-  proposalBond: BigInt
-  liveness: BigInt
-  timestamp: BigInt
-  blockNumber: BigInt
-  transactionHash: Bytes
+  questionID: Bytes!        # Links to other Polymarket subgraphs
+  creator: Bytes            # Market creator address
+  question: String          # 🎯 Human-readable market name
+  reward: BigInt            # Market reward/incentive
+  timestamp: BigInt         # Creation timestamp
+  # ... additional metadata
 }
+```
 
-type PriceRequest @entity {
-  id: ID!
-  requester: Bytes!
-  identifier: Bytes!
-  timestamp: BigInt!
-  ancillaryData: Bytes
-  currency: Bytes
-  reward: BigInt
-  blockNumber: BigInt
-  transactionHash: Bytes
-}
+## 🔍 **Query Examples**
 
-type QuestionInitialized @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  requestTimestamp: BigInt # uint256
-  creator: Bytes! # address
-  ancillaryData: Bytes! # bytes
-  question: String # human-readable question
-  rewardToken: Bytes! # address
-  reward: BigInt! # uint256
-  proposalBond: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type QuestionResolved @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  settledPrice: BigInt! # int256
-  payouts: [BigInt!]! # uint256[]
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type AncillaryDataUpdated @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  owner: Bytes! # address
-  update: Bytes! # bytes
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type QuestionEmergencyResolved @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  payouts: [BigInt!]! # uint256[]
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type QuestionFlagged @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type QuestionPaused @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type QuestionReset @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type QuestionUnpaused @entity(immutable: true) {
-  id: Bytes!
-  questionID: Bytes! # bytes32
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type NewAdmin @entity(immutable: true) {
-  id: Bytes!
-  admin: Bytes! # address
-  newAdminAddress: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type RemovedAdmin @entity(immutable: true) {
-  id: Bytes!
-  admin: Bytes! # address
-  removedAdmin: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-Queries
-Once deployed, you can query the subgraph using GraphQL. Below are example queries organized by category:
-1. Market Discovery & Search
-graphql
-
+### **Basic Market Discovery**
+```graphql
 {
-  # Search by keywords
-  cryptoMarkets: markets(where: { question_contains_nocase: "bitcoin" }) {
+  # Get all markets with readable names
+  markets(first: 10, orderBy: timestamp, orderDirection: desc) {
     questionID
     question
     creator
+    timestamp
+  }
+}
+```
+
+### **Search by Category**
+```graphql
+{
+  # Crypto markets
+  cryptoMarkets: markets(where: { question_contains_nocase: "bitcoin" }) {
+    questionID
+    question
     reward
   }
   
   # Sports markets
   sportsMarkets: markets(where: { question_contains: "vs." }) {
+    questionID
     question
     timestamp
   }
   
   # Political markets
   politicalMarkets: markets(where: { question_contains_nocase: "trump" }) {
+    questionID
     question
     creator
   }
 }
+```
 
-2. Economic Analysis
-graphql
-
+### **Economic Analysis**
+```graphql
 {
-  # High-value markets (rewards > $5)
+  # High-reward markets (> $5 USDC)
   premiumMarkets: markets(where: { reward_gte: "5000000" }) {
     question
     reward
     creator
   }
   
-  # Free markets (no rewards)
-  freeMarkets: markets(where: { reward: "0" }) {
-    question
-    creator
-  }
-  
-  # Reward distribution analysis
-  allRewards: markets(first: 1000, orderBy: reward, orderDirection: desc) {
-    reward
-    question
-  }
-}
-
-3. Creator Analytics
-graphql
-
-{
-  # Most active creator
-  creatorActivity: markets(
-    where: { creator: "0x91430cad2d3975766499717fa0d66a78d814e5c5" }
-    first: 50
-  ) {
-    question
-    reward
-    timestamp
-  }
-  
-  # Creator diversity
-  allCreators: markets(first: 1000) {
-    creator
-    reward
-    timestamp
-  }
-}
-
-4. Time-Based Analysis
-graphql
-
-{
-  # Recent markets (last 24h)
+  # Recent high-activity markets
   recentMarkets: markets(
     where: { timestamp_gte: "1749240000" }
-    orderBy: timestamp
-    orderDirection: desc
-  ) {
-    question
-    timestamp
-    creator
-  }
-  
-  # Market creation timeline
-  marketTimeline: markets(
-    first: 100
-    orderBy: timestamp
-    orderDirection: desc
-  ) {
-    question
-    timestamp
-    creator
-  }
-}
-
-5. Advanced Filtering
-graphql
-
-{
-  # Multi-criteria search
-  filteredMarkets: markets(
-    where: {
-      question_contains: "Bitcoin"
-      reward_gte: "1000000"
-      timestamp_gte: "1748000000"
-    }
     orderBy: reward
     orderDirection: desc
+    first: 20
   ) {
     question
     reward
     timestamp
-    creator
   }
 }
+```
 
-Specialized Queries by Market Type
-Crypto Trading Markets
-graphql
-
+### **Integration-Ready Queries**
+```graphql
 {
-  # Bitcoin price predictions
-  bitcoinMarkets: markets(where: { question_contains_nocase: "bitcoin up or down" }) {
-    question
-    timestamp
-    creator
-  }
-  
-  # Crypto threshold markets
-  cryptoThresholds: markets(where: { question_contains: "Bitcoin Over" }) {
-    question
-    reward
-  }
-}
-
-Sports & Gaming
-graphql
-
-{
-  # Esports tournaments
-  esportsMarkets: markets(where: { question_contains: "LEC" }) {
-    question
-    timestamp
-  }
-  
-  # Tennis matches
-  tennisMarkets: markets(where: { question_contains: "French Open" }) {
-    question
-    timestamp
-  }
-  
-  # CS:GO tournaments
-  csgoMarkets: markets(where: { question_contains: "BLAST" }) {
-    question
-    timestamp
-  }
-}
-
-Political Markets
-graphql
-
-{
-  # Trump-related markets
-  trumpMarkets: markets(where: { question_contains_nocase: "trump" }) {
-    question
-    timestamp
-    reward
-  }
-  
-  # Election markets
-  electionMarkets: markets(where: { question_contains: "Election" }) {
-    question
-    creator
-  }
-}
-
-Analytics & Statistics
-Market Volume Analysis
-graphql
-
-{
-  # Count by creator
-  markets(first: 1000) {
-    creator
-    reward
-  }
-  
-  # Reward statistics
-  markets(orderBy: reward, orderDirection: desc, first: 100) {
-    reward
-    question
-  }
-}
-
-Trend Analysis
-graphql
-
-{
-  # Markets by day/week
-  markets(
-    where: { timestamp_gte: "TIMESTAMP_HERE" }
-    orderBy: timestamp
-  ) {
-    timestamp
-    question
-    creator
-  }
-}
-
-Integration-Ready Queries
-For Dashboard Cards
-graphql
-
-{
+  # Perfect for dashboard cards
   dashboardData: markets(
     first: 12
     orderBy: timestamp
     orderDirection: desc
     where: { reward_gte: "1000000" }
   ) {
-    questionID  # For linking to other subgraphs
-    question    # Human-readable title
-    creator     # Market creator
-    reward      # Market incentive
-    timestamp   # Creation time
+    questionID    # For linking to other subgraphs
+    question      # Clean title for UI
+    creator       # Market creator
+    reward        # Incentive amount
+    timestamp     # Creation time
   }
 }
+```
 
-For Search Functionality
-graphql
+## 🔗 **Integration with Other Subgraphs**
 
-{
-  searchResults: markets(
-    where: { question_contains_nocase: $searchTerm }
-    first: 20
-    orderBy: timestamp
-    orderDirection: desc
-  ) {
+This subgraph is the **missing piece** that makes all other Polymarket subgraphs truly useful:
+
+```javascript
+// Step 1: Get trading data from main Polymarket subgraph
+const tradingData = await queryMainSubgraph(`{
+  fixedProductMarketMakers(first: 10) {
+    conditions        # Contains questionID
+    scaledCollateralVolume
+    outcomeTokenPrices
+  }
+}`);
+
+// Step 2: Get human names from THIS subgraph
+const marketNames = await queryNamesSubgraph(`{
+  markets(where: { questionID_in: ["0x..."] }) {
     questionID
-    question
-    timestamp
-    creator
+    question          # Clean human-readable name!
   }
-}
+}`);
 
-Information You Can Extract
-Market Intelligence
-Market Categories: Crypto, Sports, Politics, Entertainment
+// Step 3: Perfect dashboard data!
+const enrichedData = tradingData.map(market => ({
+  ...market,
+  humanName: marketNames.find(m => m.questionID === market.conditions[0])?.question,
+  volume: formatCurrency(market.scaledCollateralVolume)
+}));
+```
 
-Market Creators: Who's creating the most markets
+## 🌐 **Deployment Information**
 
-Reward Patterns: Which markets have higher incentives
+- **Network**: Polygon
+- **Subgraph ID**: `QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku`
+- **GraphQL Endpoint**: `https://api.thegraph.com/subgraphs/id/QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku`
+- **Explorer**: [View in The Graph Explorer](https://thegraph.com/explorer/subgraphs/QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku)
 
-Time Trends: When markets are created
+## 💡 **Use Cases**
 
-Popular Topics: What subjects are trending
+### **For Dashboard Developers**
+- Get clean market titles for UI cards
+- Search markets by keywords
+- Display trending topics
+- Show market categories
 
-Business Analytics
-Creator Activity: Most active market creators
+### **For Trading Bots**
+- Match market names to trading strategies
+- Filter markets by type or keywords
+- Track specific market creators
+- Monitor high-reward opportunities
 
-Market Economics: Reward distribution patterns
+### **For Analytics Tools**
+- Analyze market creation trends
+- Study creator behavior patterns
+- Track reward distribution
+- Generate market reports
 
-Growth Metrics: Market creation over time
+### **For Mobile Apps**
+- Display user-friendly market names
+- Implement search functionality
+- Show market categories
+- Create notification systems
 
-Content Analysis: Popular keywords and topics
+## 🛠️ **Development**
 
-Integration Data
-questionID: Links to other Polymarket subgraphs
+### **Prerequisites**
+- Node.js (v18+)
+- Graph CLI: `npm install -g @graphprotocol/graph-cli`
 
-Human Names: Clean titles for UIs
+### **Setup**
+```bash
+# Clone the repository
+git clone https://github.com/PaulieB14/Polymarket-Names.git
+cd Polymarket-Names
 
-Timestamps: For time-series analysis
+# Install dependencies
+npm install
 
-Creator Info: For user tracking
+# Build the subgraph
+npm run codegen
+npm run build
+```
 
-Power User Queries
-Combine multiple filters for sophisticated analysis:
-graphql
+### **Deploy**
+```bash
+# Authenticate with The Graph
+graph auth <your-deploy-key>
 
-{
-  sophisticatedAnalysis: markets(
-    where: {
-      question_contains_nocase: "bitcoin"
-      reward_gte: "5000000"  
-      timestamp_gte: "1749000000"
-      creator: "0x91430cad2d3975766499717fa0d66a78d814e5c5"
-    }
-    orderBy: reward
-    orderDirection: desc
-    first: 10
-  ) {
-    questionID
-    question
-    reward
-    timestamp
-    creator
-  }
-}
+# Deploy to The Graph Studio
+npm run deploy
+```
 
-### Changes Made
-1. **Consistent Markdown Formatting**: Used proper Markdown headers, lists, and code blocks throughout.
-2. **Code Block Syntax**: Specified `graphql` for all GraphQL code blocks to ensure proper syntax highlighting.
-3. **Removed Emojis**: Replaced emojis with standard text for a cleaner, professional look (e.g., "Core Query Categories" instead of "📊 Core Query Categories").
-4. **Standardized Structure**: Organized queries under clear, consistent headings and subheadings.
-5. **Fixed Indentation**: Ensured consistent indentation in GraphQL queries for readability.
-6. **Improved Clarity**: Reworded some section titles and descriptions for conciseness and clarity.
-7. **Removed Redundant Text**: Consolidated repetitive explanations to make the document more concise.
+## 📈 **Data Coverage**
 
-This version maintains all the original content while improving readability and consistency in Markdown format. Let me know if you need further adjustments!
+This subgraph indexes diverse market types:
 
-Explain GraphQL queries
+- **💰 Crypto**: Bitcoin, Ethereum, altcoin price predictions
+- **🏛️ Politics**: Elections, policy outcomes, political events  
+- **⚽ Sports**: Football, tennis, basketball, F1 racing
+- **🎮 Esports**: League of Legends, CS:GO, tournament outcomes
+- **🚀 Technology**: Product launches, company milestones
+- **🌍 Current Events**: News predictions, cultural events
 
-Augur prediction markets
+## 🤝 **Contributing**
 
-more concise schema
+We welcome contributions! Please feel free to:
 
+- Submit bug reports and feature requests
+- Improve documentation
+- Add new query examples
+- Optimize parsing logic
+
+## 📄 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 **Acknowledgments**
+
+- **UMA Protocol** - For the Optimistic Oracle infrastructure
+- **The Graph** - For the decentralized indexing protocol
+- **Polymarket** - For the prediction market platform
+- **Gnosis** - For the Conditional Tokens Framework
+
+---
+
+## 🔗 **Related Projects**
+
+- [Main Polymarket Subgraph Analytics](https://github.com/PaulieB14/polymarket-subgraph-analytics) - Comprehensive query examples
+- [UMA CTF Adapter](https://github.com/Polymarket/uma-ctf-adapter) - Resolution infrastructure
+- [Conditional Tokens](https://github.com/gnosis/conditional-tokens-contracts) - Market framework
+
+---
+
+**Built with ❤️ for the decentralized prediction market ecosystem**

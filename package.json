@@ -1,0 +1,21 @@
+{
+  "name": "polymarket-subgraph",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "codegen": "graph codegen",
+    "build": "graph build",
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ --ipfs https://api.thegraph.com/ipfs/ polymarket-human-readable-markets",
+    "create-local": "graph create --node http://localhost:8020/ polymarket-human-readable-markets",
+    "remove-local": "graph remove --node http://localhost:8020/ polymarket-human-readable-markets",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 polymarket-human-readable-markets"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Subgraph to extract human-readable market names from Polymarket contracts",
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.93.1",
+    "@graphprotocol/graph-ts": "^0.38.1"
+  }
+}

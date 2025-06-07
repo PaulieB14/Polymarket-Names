@@ -1,0 +1,94 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: UMACTFAdapterV2
+    network: matic
+    source:
+      address: "0x6A9D222616C90FcA5754cd1333cFD9b7fb6a4F74"
+      abi: UMACTFAdapter
+      startBlock: 40000000  # We'll use a recent block for now
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Market
+        - QuestionInitialized
+        - QuestionResolved
+        - AncillaryDataUpdated
+        - QuestionEmergencyResolved
+        - QuestionFlagged
+        - QuestionPaused
+        - QuestionReset
+        - QuestionUnpaused
+        - NewAdmin
+        - RemovedAdmin
+      abis:
+        - name: UMACTFAdapter
+          file: ./src/abis/UMACTFAdapter.json
+      eventHandlers:
+        - event: QuestionInitialized(indexed bytes32,indexed address,bytes,address,uint256,uint256,uint256)
+          handler: handleQuestionInitialized
+      file: ./src/uma-ctf-adapter.ts
+  - kind: ethereum
+    name: UMACTFAdapterLegacy
+    network: matic
+    source:
+      address: "0x71392E133063CC0D16F40E1F9B60227404Bc03f7"
+      abi: UMACTFAdapter
+      startBlock: 40000000  # We'll use a recent block for now
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Market
+        - QuestionInitialized
+        - QuestionResolved
+        - AncillaryDataUpdated
+        - QuestionEmergencyResolved
+        - QuestionFlagged
+        - QuestionPaused
+        - QuestionReset
+        - QuestionUnpaused
+        - NewAdmin
+        - RemovedAdmin
+      abis:
+        - name: UMACTFAdapter
+          file: ./src/abis/UMACTFAdapter.json
+      eventHandlers:
+        - event: QuestionInitialized(indexed bytes32,indexed address,bytes,address,uint256,uint256,uint256)
+          handler: handleQuestionInitialized
+      file: ./src/uma-ctf-adapter.ts
+  - kind: ethereum
+    name: BinaryAdapter
+    network: matic
+    source:
+      address: "0xCB1822859cEF82Cd2Eb4E6276C7916e692995130"
+      abi: BinaryAdapter
+      startBlock: 40000000  # We'll use a recent block for now
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Market
+        - QuestionInitialized
+        - QuestionResolved
+        - AncillaryDataUpdated
+        - QuestionEmergencyResolved
+        - QuestionFlagged
+        - QuestionPaused
+        - QuestionReset
+        - QuestionUnpaused
+        - NewAdmin
+        - RemovedAdmin
+      abis:
+        - name: BinaryAdapter
+          file: ./src/abis/BinaryAdapter.json
+      eventHandlers:
+        - event: QuestionInitialized(indexed bytes32,bytes,uint256,address,uint256,uint256,bool)
+          handler: handleBinaryQuestionInitialized
+      file: ./src/uma-ctf-adapter.ts

@@ -81,7 +81,7 @@ export function handleQuestionInitialized(event: QuestionInitializedEvent): void
   market.rewardToken = event.params.rewardToken
   market.reward = event.params.reward
   market.proposalBond = event.params.proposalBond
-  market.liveness = event.params.liveness
+  market.liveness = BigInt.fromI32(0) // Default value since liveness is no longer in the event
   
   // Set metadata
   market.timestamp = event.block.timestamp
@@ -104,6 +104,7 @@ export function handleQuestionInitialized(event: QuestionInitializedEvent): void
   )
   
   entity.questionID = event.params.questionID
+  entity.requestTimestamp = event.params.requestTimestamp
   entity.creator = event.params.creator
   entity.ancillaryData = event.params.ancillaryData
   entity.rewardToken = event.params.rewardToken

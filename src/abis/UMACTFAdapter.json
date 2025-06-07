@@ -10,6 +10,12 @@
       },
       {
         "indexed": true,
+        "internalType": "uint256",
+        "name": "requestTimestamp",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
         "internalType": "address",
         "name": "creator",
         "type": "address"
@@ -36,12 +42,6 @@
         "indexed": false,
         "internalType": "uint256",
         "name": "proposalBond",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "liveness",
         "type": "uint256"
       }
     ],

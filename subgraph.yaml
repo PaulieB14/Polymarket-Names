@@ -29,7 +29,7 @@ dataSources:
         - name: UMACTFAdapter
           file: ./src/abis/UMACTFAdapter.json
       eventHandlers:
-        - event: QuestionInitialized(indexed bytes32,indexed address,bytes,address,uint256,uint256,uint256)
+        - event: QuestionInitialized(indexed bytes32,indexed uint256,indexed address,bytes,address,uint256,uint256)
           handler: handleQuestionInitialized
       file: ./src/uma-ctf-adapter.ts
   - kind: ethereum
@@ -59,7 +59,7 @@ dataSources:
         - name: UMACTFAdapter
           file: ./src/abis/UMACTFAdapter.json
       eventHandlers:
-        - event: QuestionInitialized(indexed bytes32,indexed address,bytes,address,uint256,uint256,uint256)
+        - event: QuestionInitialized(indexed bytes32,indexed uint256,indexed address,bytes,address,uint256,uint256)
           handler: handleQuestionInitialized
       file: ./src/uma-ctf-adapter.ts
   - kind: ethereum

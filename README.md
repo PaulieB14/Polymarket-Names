@@ -140,97 +140,270 @@ type RemovedAdmin @entity(immutable: true) {
 }
 ```
 
-## How It Works
 
-1. The subgraph listens for `QuestionInitialized` events from the UMA CTF Adapter contracts.
-2. When an event is detected, it extracts the ancillary data, which contains the human-readable question.
-3. It attempts to parse the ancillary data as JSON and extract the question field.
-4. If parsing as JSON fails, it falls back to a regex-based approach to extract the question.
-5. The extracted question is stored in the `Market` entity, which can be queried using the market ID.
-
-## Deployment
-
-### Prerequisites
-
-- Node.js (v20.18.1 or later recommended)
-- Graph CLI installed globally: `npm install -g @graphprotocol/graph-cli`
-
-### Deploying to The Graph Studio
-
-1. Authenticate with The Graph:
-
-```bash
-graph auth <your-deploy-key>
-```
-
-2. Deploy the subgraph:
-
-```bash
-cd polymarket-subgraph
-npm run deploy
-```
-
-### Deploying Locally
-
-1. Start a local Graph Node:
-
-```bash
-# Using Docker
-docker-compose up -d
-```
-
-2. Create and deploy the subgraph locally:
-
-```bash
-cd polymarket-subgraph
-npm run create-local
-npm run deploy-local
-```
-
-## Usage
 
 Once deployed, you can query the subgraph using GraphQL. Here's an example query to get a market by its ID:
 
-```graphql
-{
-  market(id: "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef") {
-    id
+📊 Core Query Categories:
+1. 🎯 MARKET DISCOVERY & SEARCH
+graphql
+
+```{
+  # Search by keywords
+  cryptoMarkets: markets(where: { question_contains_nocase: "bitcoin" }) {
     questionID
     question
     creator
+    reward
+  }
+  
+  # Sports markets
+  sportsMarkets: markets(where: { question_contains: "vs." }) {
+    question
     timestamp
+  }
+  
+  # Political markets
+  politicalMarkets: markets(where: { question_contains_nocase: "trump" }) {
+    question
+    creator
+  }
+}
+2. 💰 ECONOMIC ANALYSIS
+graphql{
+  # High-value markets (rewards > $5)
+  premiumMarkets: markets(where: { reward_gte: "5000000" }) {
+    question
+    reward
+    creator
+  }
+  
+  # Free markets (no rewards)
+  freeMarkets: markets(where: { reward: "0" }) {
+    question
+    creator
+  }
+  
+  # Reward distribution analysis
+  allRewards: markets(first: 1000, orderBy: reward, orderDirection: desc) {
+    reward
+    question
+  }
+}
+3. 👥 CREATOR ANALYTICS
+graphql{
+  # Most active creator
+  creatorActivity: markets(
+    where: { creator: "0x91430cad2d3975766499717fa0d66a78d814e5c5" }
+    first: 50
+  ) {
+    question
+    reward
+    timestamp
+  }
+  
+  # Creator diversity
+  allCreators: markets(first: 1000) {
+    creator
+    reward
+    timestamp
+  }
+}
+4. ⏰ TIME-BASED ANALYSIS
+graphql{
+  # Recent markets (last 24h)
+  recentMarkets: markets(
+    where: { timestamp_gte: "1749240000" }
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    question
+    timestamp
+    creator
+  }
+  
+  # Market creation timeline
+  marketTimeline: markets(
+    first: 100
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    question
+    timestamp
+    creator
+  }
+}
+5. 🔍 ADVANCED FILTERING
+graphql{
+  # Multi-criteria search
+  filteredMarkets: markets(
+    where: {
+      question_contains: "Bitcoin"
+      reward_gte: "1000000"
+      timestamp_gte: "1748000000"
+    }
+    orderBy: reward
+    orderDirection: desc
+  ) {
+    question
+    reward
+    timestamp
+    creator
+  }
+}
+🎮 Specialized Queries by Market Type:
+Crypto Trading Markets:
+graphql{
+  # Bitcoin price predictions
+  bitcoinMarkets: markets(where: { question_contains_nocase: "bitcoin up or down" }) {
+    question
+    timestamp
+    creator
+  }
+  
+  # Crypto threshold markets
+  cryptoThresholds: markets(where: { question_contains: "Bitcoin Over" }) {
+    question
+    reward
+  }
+}
+Sports & Gaming:
+graphql{
+  # Esports tournaments
+  esportsMarkets: markets(where: { question_contains: "LEC" }) {
+    question
+    timestamp
+  }
+  
+  # Tennis matches
+  tennisMarkets: markets(where: { question_contains: "French Open" }) {
+    question
+    timestamp
+  }
+  
+  # CS:GO tournaments
+  csgoMarkets: markets(where: { question_contains: "BLAST" }) {
+    question
+    timestamp
+  }
+}
+Political Markets:
+graphql{
+  # Trump-related markets
+  trumpMarkets: markets(where: { question_contains_nocase: "trump" }) {
+    question
+    timestamp
+    reward
+  }
+  
+  # Election markets
+  electionMarkets: markets(where: { question_contains: "Election" }) {
+    question
+    creator
+  }
+}
+📈 Analytics & Statistics:
+Market Volume Analysis:
+graphql{
+  # Count by creator
+  markets(first: 1000) {
+    creator
+    reward
+  }
+  
+  # Reward statistics
+  markets(orderBy: reward, orderDirection: desc, first: 100) {
+    reward
+    question
+  }
+}
+Trend Analysis:
+graphql{
+  # Markets by day/week
+  markets(
+    where: { timestamp_gte: "TIMESTAMP_HERE" }
+    orderBy: timestamp
+  ) {
+    timestamp
+    question
+    creator
+  }
+}
+🔧 Integration-Ready Queries:
+For Dashboard Cards:
+graphql{
+  dashboardData: markets(
+    first: 12
+    orderBy: timestamp
+    orderDirection: desc
+    where: { reward_gte: "1000000" }
+  ) {
+    questionID  # For linking to other subgraphs
+    question    # Human-readable title
+    creator     # Market creator
+    reward      # Market incentive
+    timestamp   # Creation time
+  }
+}
+For Search Functionality:
+graphql{
+  searchResults: markets(
+    where: { question_contains_nocase: $searchTerm }
+    first: 20
+    orderBy: timestamp
+    orderDirection: desc
+  ) {
+    questionID
+    question
+    timestamp
+    creator
   }
 }
 ```
 
-Or to get all markets:
+🎯 What Information You Can Extract:
+Market Intelligence:
 
-```graphql
-{
-  markets(first: 100) {
-    id
+Market Categories: Crypto, Sports, Politics, Entertainment
+Market Creators: Who's creating the most markets
+Reward Patterns: Which markets have higher incentives
+Time Trends: When markets are created
+Popular Topics: What subjects are trending
+
+Business Analytics:
+
+Creator Activity: Most active market creators
+Market Economics: Reward distribution patterns
+Growth Metrics: Market creation over time
+Content Analysis: Popular keywords and topics
+
+Integration Data:
+
+questionID: Links to other Polymarket subgraphs
+Human Names: Clean titles for UIs
+Timestamps: For time-series analysis
+Creator Info: For user tracking
+
+🚀 Power User Queries:
+You can even combine multiple filters for sophisticated analysis:
+graphql
+```{
+  sophisticatedAnalysis: markets(
+    where: {
+      question_contains_nocase: "bitcoin"
+      reward_gte: "5000000"  
+      timestamp_gte: "1749000000"
+      creator: "0x91430cad2d3975766499717fa0d66a78d814e5c5"
+    }
+    orderBy: reward
+    orderDirection: desc
+    first: 10
+  ) {
     questionID
     question
-    creator
+    reward
     timestamp
+    creator
   }
 }
 ```
-
-## Development
-
-### Building
-
-```bash
-cd polymarket-subgraph
-npm run codegen
-npm run build
-```
-
-### Testing
-
-You can test the subgraph by deploying it to a local Graph Node and querying it.
-
-## License
-
-ISC

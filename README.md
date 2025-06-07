@@ -218,71 +218,9 @@ const enrichedData = tradingData.map(market => ({
 - **GraphQL Endpoint**: `https://api.thegraph.com/subgraphs/id/QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku`
 - **Explorer**: [View in The Graph Explorer](https://thegraph.com/explorer/subgraphs/22CoTbEtpv6fURB6moTNfJPWNUPXtiFGRA8h1zajMha3?v=1&view=About&chain=arbitrum-one)
 
-## 💡 **Use Cases**
 
-### **For Dashboard Developers**
-- Get clean market titles for UI cards
-- Search markets by keywords
-- Display trending topics
-- Show market categories
+## How to get API key with The Graph [Here](https://thegraph.com/docs/en/subgraphs/querying/managing-api-keys/)
 
-### **For Trading Bots**
-- Match market names to trading strategies
-- Filter markets by type or keywords
-- Track specific market creators
-- Monitor high-reward opportunities
-
-### **For Analytics Tools**
-- Analyze market creation trends
-- Study creator behavior patterns
-- Track reward distribution
-- Generate market reports
-
-### **For Mobile Apps**
-- Display user-friendly market names
-- Implement search functionality
-- Show market categories
-- Create notification systems
-
-## 🛠️ **Development**
-
-### **Prerequisites**
-- Node.js (v18+)
-- Graph CLI: `npm install -g @graphprotocol/graph-cli`
-
-### **Setup**
-```bash
-# Clone the repository
-git clone https://github.com/PaulieB14/Polymarket-Names.git
-cd Polymarket-Names
-
-# Install dependencies
-npm install
-
-# Build the subgraph
-npm run codegen
-npm run build
-```
-
-### **Deploy**
-```bash
-# Authenticate with The Graph
-graph auth <your-deploy-key>
-
-# Deploy to The Graph Studio
-npm run deploy
-```
-
-## 📈 **Data Coverage**
-
-This subgraph indexes diverse market types:
-
-- **💰 Crypto**: Bitcoin, Ethereum, altcoin price predictions
-- **🏛️ Politics**: Elections, policy outcomes, political events  
-- **⚽ Sports**: Football, tennis, basketball, F1 racing
-- **🎮 Esports**: League of Legends, CS:GO, tournament outcomes
-- **🚀 Technology**: Product launches, company milestones
-- **🌍 Current Events**: News predictions, cultural events
 
 ## 🤝 **Contributing**
 

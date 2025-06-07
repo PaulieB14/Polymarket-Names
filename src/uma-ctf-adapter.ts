@@ -17,7 +17,7 @@ import {
 
 import { BigInt, Bytes, log, json, JSONValueKind } from "@graphprotocol/graph-ts"
 
-// Helper function to decode ancillary data and extract human-readable question
+// Helper function to decode ancillary data and extract clean title and description
 function extractQuestionFromAncillaryData(ancillaryData: Bytes): string | null {
   if (ancillaryData.length === 0) {
     return null
@@ -27,7 +27,43 @@ function extractQuestionFromAncillaryData(ancillaryData: Bytes): string | null {
   let ancillaryDataString = ancillaryData.toString()
   log.info("Raw ancillary data: {}", [ancillaryDataString])
   
-  // Try to parse as JSON
+  // Extract title using string operations
+  let title: string | null = null
+  let description: string | null = null
+  
+  // Look for "title:" in the string
+  let titleIndex = ancillaryDataString.indexOf("title:")
+  if (titleIndex >= 0) {
+    let startIndex = titleIndex + 6 // Length of 'title:'
+    let endIndex = ancillaryDataString.indexOf(",", startIndex)
+    
+    if (endIndex > startIndex) {
+      title = ancillaryDataString.substring(startIndex, endIndex).trim()
+      log.info("Extracted title: {}", [title])
+    }
+  }
+  
+  // Look for "description:" in the string
+  let descIndex = ancillaryDataString.indexOf("description:")
+  if (descIndex >= 0) {
+    let startIndex = descIndex + 12 // Length of 'description:'
+    let endIndex = ancillaryDataString.indexOf(".", startIndex)
+    
+    if (endIndex > startIndex) {
+      description = ancillaryDataString.substring(startIndex, endIndex + 1).trim()
+      log.info("Extracted description: {}", [description])
+    }
+  }
+  
+  // If we found a title, return it (optionally with description)
+  if (title) {
+    if (description) {
+      return title + " - " + description
+    }
+    return title
+  }
+  
+  // Fallback: Try to parse as JSON
   let jsonResult = json.try_fromString(ancillaryDataString)
   if (jsonResult.isOk) {
     let jsonValue = jsonResult.value
@@ -37,9 +73,22 @@ function extractQuestionFromAncillaryData(ancillaryData: Bytes): string | null {
       // Look for question field (usually "q")
       let questionValue = obj.get("q")
       if (questionValue && questionValue.kind == JSONValueKind.STRING) {
-        let question = questionValue.toString()
-        log.info("Extracted question: {}", [question])
-        return question
+        let questionStr = questionValue.toString()
+        
+        // Try to extract title from the JSON question value
+        titleIndex = questionStr.indexOf("title:")
+        if (titleIndex >= 0) {
+          let startIndex = titleIndex + 6 // Length of 'title:'
+          let endIndex = questionStr.indexOf(",", startIndex)
+          
+          if (endIndex > startIndex) {
+            title = questionStr.substring(startIndex, endIndex).trim()
+            log.info("Extracted title from JSON: {}", [title])
+            return title
+          }
+        }
+        
+        return questionStr
       }
       
       // Fallback: look for "question" field
@@ -50,20 +99,24 @@ function extractQuestionFromAncillaryData(ancillaryData: Bytes): string | null {
     }
   }
   
-  // If JSON parsing fails, try a regex-based approach
-  let qPattern = ancillaryDataString.indexOf("q\":\"")
-  if (qPattern >= 0) {
-    let startIndex = qPattern + 4 // Length of 'q":"'
-    let endIndex = ancillaryDataString.indexOf("\"", startIndex)
+  // If JSON parsing fails, try a simple string-based approach
+  let qIndex = ancillaryDataString.indexOf("q:")
+  if (qIndex >= 0) {
+    let startIndex = qIndex + 2 // Length of 'q:'
+    let endIndex = ancillaryDataString.indexOf(",", startIndex)
     
     if (endIndex > startIndex) {
-      let question = ancillaryDataString.substring(startIndex, endIndex)
-      log.info("Extracted question using regex: {}", [question])
+      let question = ancillaryDataString.substring(startIndex, endIndex).trim()
+      log.info("Extracted question using simple approach: {}", [question])
       return question
     }
   }
   
-  // If all else fails, return the raw string (might be plain text)
+  // If all else fails, return a truncated version of the raw string
+  if (ancillaryDataString.length > 100) {
+    return ancillaryDataString.substring(0, 100) + "..."
+  }
+  
   return ancillaryDataString
 }
 

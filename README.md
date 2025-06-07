@@ -216,7 +216,7 @@ const enrichedData = tradingData.map(market => ({
 - **Network**: Polygon
 - **Subgraph ID**: `QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku`
 - **GraphQL Endpoint**: `https://api.thegraph.com/subgraphs/id/QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku`
-- **Explorer**: [View in The Graph Explorer](https://thegraph.com/explorer/subgraphs/QmP6hMoYTYx4dFGs2dYiNnUDsRZ4ybhH9N6C6G19tHQxku)
+- **Explorer**: [View in The Graph Explorer](https://thegraph.com/explorer/subgraphs/22CoTbEtpv6fURB6moTNfJPWNUPXtiFGRA8h1zajMha3?v=1&view=About&chain=arbitrum-one)
 
 ## 💡 **Use Cases**
 

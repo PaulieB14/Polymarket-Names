@@ -16,7 +16,6 @@ It captures the `QuestionInitialized` events from these contracts and extracts t
 
 The subgraph defines the following entities:
 
-### Market
 
 ```graphql
 type Market @entity {
@@ -32,6 +31,112 @@ type Market @entity {
   timestamp: BigInt
   blockNumber: BigInt
   transactionHash: Bytes
+}
+
+type PriceRequest @entity {
+  id: ID!
+  requester: Bytes!
+  identifier: Bytes!
+  timestamp: BigInt!
+  ancillaryData: Bytes
+  currency: Bytes
+  reward: BigInt
+  blockNumber: BigInt
+  transactionHash: Bytes
+}
+
+type QuestionInitialized @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  requestTimestamp: BigInt # uint256
+  creator: Bytes! # address
+  ancillaryData: Bytes! # bytes
+  question: String # human-readable question
+  rewardToken: Bytes! # address
+  reward: BigInt! # uint256
+  proposalBond: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestionResolved @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  settledPrice: BigInt! # int256
+  payouts: [BigInt!]! # uint256[]
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type AncillaryDataUpdated @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  owner: Bytes! # address
+  update: Bytes! # bytes
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestionEmergencyResolved @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  payouts: [BigInt!]! # uint256[]
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestionFlagged @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestionPaused @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestionReset @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type QuestionUnpaused @entity(immutable: true) {
+  id: Bytes!
+  questionID: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type NewAdmin @entity(immutable: true) {
+  id: Bytes!
+  admin: Bytes! # address
+  newAdminAddress: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RemovedAdmin @entity(immutable: true) {
+  id: Bytes!
+  admin: Bytes! # address
+  removedAdmin: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
 }
 ```
 

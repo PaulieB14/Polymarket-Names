@@ -28,13 +28,9 @@
 }
 ```
 
-## 🎯 **Key Features**
+## 📋 **Schema Overview**
 
-- ✅ **100% Decentralized** - No API dependencies
-- ✅ **Human-Readable Names** - Clean market titles extracted from on-chain data
-- ✅ **Real-Time** - Indexes new markets as they're created
-- ✅ **Comprehensive** - Covers all market types (crypto, sports, politics, etc.)
-- ✅ **Integration Ready** - Perfect for dashboards, bots, and analytics
+![Polymarket Subgraph Schema](./docs/schema-diagram.png)
 
 ## 📊 **Quick Example**
 

@@ -14,6 +14,10 @@ It captures the `QuestionInitialized` events from these contracts and extracts t
 
 ## Schema
 
+### Schema Diagram
+
+![Schema Diagram](assets/schema-diagram.png)
+
 The subgraph defines the following entities:
 
 ### Market
